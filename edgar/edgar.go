@@ -44,3 +44,28 @@ func (c *Client) FilingsForCIK(cik string) ([]filings.Item, error) {
 
 	return fResp.Dir.Items, nil
 }
+
+// FilingDocs accepts company cik number,
+// filing name and returns filing documents
+func (c *Client) FilingDocs(cik, name string) ([]filings.Item, error) {
+	filingURL := c.baseURL + "/" + cik + "/" + name + "/" + "index.json"
+
+	resp, err := http.Get(filingURL)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var fResp filings.Resp
+	err = json.Unmarshal(body, &fResp)
+	if err != nil {
+		return nil, err
+	}
+
+	return fResp.Dir.Items, nil
+}
