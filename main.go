@@ -21,11 +21,13 @@ func main() {
 		panic(err)
 	}
 
-	content, err := client.FilingDocContent(GOLDMAN_SACHS_CIK, fs[0].Name, docs[0].Name)
+	doc, err := client.GetFilingDoc(GOLDMAN_SACHS_CIK, fs[0].Name, docs[3].Name)
 	if err != nil {
 		panic(err)
 	}
-	log.Println(content)
+
+	log.Println(doc.Type)
+	// log.Println(content)
 
 	// for _, doc := range docs {
 	// 	if doc.Type == edgar.TextType {

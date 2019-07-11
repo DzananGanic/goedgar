@@ -70,20 +70,30 @@ func (c *Client) FilingDocs(cik, name string) ([]filings.Item, error) {
 	return fResp.Dir.Items, nil
 }
 
-// FilingDocContent returns the filing document content
-func (c *Client) FilingDocContent(cik, filingName, docName string) (string, error) {
+// FilingDoc type contains the document content
+// and document type
+type FilingDoc struct {
+	Content string `json:"content"`
+	Type    string `json:"type"`
+}
+
+// GetFilingDoc returns the filing document content
+func (c *Client) GetFilingDoc(cik, filingName, docName string) (*FilingDoc, error) {
 	filingURL := c.baseURL + "/" + cik + "/" + filingName + "/" + docName
 
 	resp, err := http.Get(filingURL)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(body), nil
+	return &FilingDoc{
+		Content: string(body),
+		Type:    http.DetectContentType(body),
+	}, nil
 }
