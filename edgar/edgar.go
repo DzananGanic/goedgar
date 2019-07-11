@@ -69,3 +69,21 @@ func (c *Client) FilingDocs(cik, name string) ([]filings.Item, error) {
 
 	return fResp.Dir.Items, nil
 }
+
+// FilingDocContent returns the filing document content
+func (c *Client) FilingDocContent(cik, filingName, docName string) (string, error) {
+	filingURL := c.baseURL + "/" + cik + "/" + filingName + "/" + docName
+
+	resp, err := http.Get(filingURL)
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}

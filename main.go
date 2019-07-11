@@ -21,6 +21,20 @@ func main() {
 		panic(err)
 	}
 
-	log.Println(docs[0])
+	content, err := client.FilingDocContent(GOLDMAN_SACHS_CIK, fs[0].Name, docs[0].Name)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(content)
+
+	// for _, doc := range docs {
+	// 	if doc.Type == edgar.TextType {
+	// 		content, err := client.FilingDocContent(GOLDMAN_SACHS_CIK, fs[0].Name, doc.Name)
+	// 		if err != nil {
+	// 			panic(err)
+	// 		}
+	// 		log.Println(content)
+	// 	}
+	// }
 
 }
