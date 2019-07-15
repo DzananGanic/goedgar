@@ -1,99 +1,57 @@
 package edgar
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
+	ghttp "net/http"
 
-	"github.com/goedgar/edgar/filings"
+	"github.com/goedgar/http"
 )
 
-// New creates new EDGAR client
-func New() *Client {
-	return &Client{
-		baseURL: "https://www.sec.gov/Archives/edgar/data",
+// New creates new EDGAR service
+func New(cl http.Client) *Service {
+	return &Service{
+		http: cl,
 	}
 }
 
-// Client represents EDGAR client
-type Client struct {
-	baseURL string
+// Service represents EDGAR service
+type Service struct {
+	http http.Client
 }
 
 // FilingsForCIK returns the filings for the company
 // with provided CIK number
-func (c *Client) FilingsForCIK(cik string) ([]filings.Item, error) {
-	filingsURL := c.baseURL + "/" + cik + "/" + "index.json"
-
-	resp, err := http.Get(filingsURL)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var fResp filings.Resp
-	err = json.Unmarshal(body, &fResp)
-	if err != nil {
-		return nil, err
-	}
-
-	return fResp.Dir.Items, nil
+func (s *Service) FilingsForCIK(cik string) ([]http.Item, error) {
+	return s.http.RequestDataItems([]string{cik, "index"})
 }
 
-// FilingDocs accepts company cik number,
+// DocsForFiling accepts company cik number,
 // filing name and returns filing documents
-func (c *Client) FilingDocs(cik, name string) ([]filings.Item, error) {
-	filingURL := c.baseURL + "/" + cik + "/" + name + "/" + "index.json"
-
-	resp, err := http.Get(filingURL)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var fResp filings.Resp
-	err = json.Unmarshal(body, &fResp)
-	if err != nil {
-		return nil, err
-	}
-
-	return fResp.Dir.Items, nil
+func (s *Service) DocsForFiling(cik, name string) ([]http.Item, error) {
+	return s.http.RequestDataItems([]string{cik, name, "index"})
 }
 
-// FilingDoc type contains the document content
+// DailyIndex accepts the year and returns the daily index
+// for provided year
+func (s *Service) DailyIndex(year string) ([]http.Item, error) {
+	return s.http.RequestDailyIndexItems([]string{year, "index"})
+}
+
+// File type contains the document content
 // and document type
-type FilingDoc struct {
+type File struct {
 	Content string `json:"content"`
 	Type    string `json:"type"`
 }
 
-// GetFilingDoc returns the filing document content
-func (c *Client) GetFilingDoc(cik, filingName, docName string) (*FilingDoc, error) {
-	filingURL := c.baseURL + "/" + cik + "/" + filingName + "/" + docName
-
-	resp, err := http.Get(filingURL)
+// FileForDoc returns the filing document file
+func (s *Service) FileForDoc(cik, filingName, docName string) (*File, error) {
+	c, err := s.http.RequestDataContent([]string{cik, filingName, docName})
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return &FilingDoc{
-		Content: string(body),
-		Type:    http.DetectContentType(body),
+	return &File{
+		Content: string(c),
+		Type:    ghttp.DetectContentType(c),
 	}, nil
 }

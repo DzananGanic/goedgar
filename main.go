@@ -4,39 +4,35 @@ import (
 	"log"
 
 	"github.com/goedgar/edgar"
+	"github.com/goedgar/http"
 )
 
 const GOLDMAN_SACHS_CIK = "886982"
 
 func main() {
-	client := edgar.New()
+	client := edgar.New(
+		*http.New(),
+	)
 
-	fs, err := client.FilingsForCIK(GOLDMAN_SACHS_CIK)
-	if err != nil {
-		panic(err)
-	}
-
-	docs, err := client.FilingDocs(GOLDMAN_SACHS_CIK, fs[0].Name)
-	if err != nil {
-		panic(err)
-	}
-
-	doc, err := client.GetFilingDoc(GOLDMAN_SACHS_CIK, fs[0].Name, docs[3].Name)
-	if err != nil {
-		panic(err)
-	}
-
-	log.Println(doc.Type)
-	// log.Println(content)
-
-	// for _, doc := range docs {
-	// 	if doc.Type == edgar.TextType {
-	// 		content, err := client.FilingDocContent(GOLDMAN_SACHS_CIK, fs[0].Name, doc.Name)
-	// 		if err != nil {
-	// 			panic(err)
-	// 		}
-	// 		log.Println(content)
-	// 	}
+	// fs, err := client.FilingsForCIK(GOLDMAN_SACHS_CIK)
+	// if err != nil {
+	// 	panic(err)
 	// }
 
+	// docs, err := client.DocsForFiling(GOLDMAN_SACHS_CIK, fs[0].Name)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// file, err := client.FileForDoc(GOLDMAN_SACHS_CIK, fs[0].Name, docs[3].Name)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	items, err := client.DailyIndex("2019")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(items)
 }
