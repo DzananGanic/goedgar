@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/goedgar/edgar"
-	"github.com/goedgar/http"
+	"github.com/goedgar/pkg/edgar"
+	"github.com/goedgar/pkg/platform/http"
 )
 
 const GOLDMAN_SACHS_CIK = "886982"

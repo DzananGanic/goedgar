@@ -3,7 +3,7 @@ package edgar
 import (
 	ghttp "net/http"
 
-	"github.com/goedgar/http"
+	"github.com/goedgar/pkg/platform/http"
 )
 
 // New creates new EDGAR service
