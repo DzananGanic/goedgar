@@ -7,9 +7,9 @@ import (
 )
 
 // New creates new EDGAR service
-func New(cl http.Client) *Service {
+func New() *Service {
 	return &Service{
-		http: cl,
+		http: *http.New(),
 	}
 }
 
